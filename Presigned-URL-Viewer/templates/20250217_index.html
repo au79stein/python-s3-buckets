@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S3 File Viewer</title>
+    <style>
+        .file-content {
+            display: none; /* Hide content initially */
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .file-link {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>S3 File Viewer</h1>
+    <ul>
+        {% for filename in files %}
+            <li>
+                <span class="file-link" onclick="toggleFile('{{ loop.index }}', '{{ url_for('view_file', key=filename) }}')">
+                    {{ filename }}
+                </span>
+                <pre id="content-{{ loop.index }}" class="file-content"></pre>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <script>
+        function toggleFile(index, url) {
+            let contentBlock = document.getElementById("content-" + index);
+
+            if (contentBlock.style.display === "block") {
+                contentBlock.style.display = "none"; // Hide content if already open
+            } else {
+                if (!contentBlock.textContent.trim()) {
+                    // Fetch content only if it's not already loaded
+                    fetch(url)
+                        .then(response => response.text())
+                        .then(text => {
+                            contentBlock.textContent = text;
+                            contentBlock.style.display = "block"; // Show content
+                        })
+                        .catch(error => {
+                            contentBlock.textContent = "Error loading file.";
+                            contentBlock.style.display = "block";
+                        });
+                } else {
+                    contentBlock.style.display = "block"; // Show if already loaded
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+

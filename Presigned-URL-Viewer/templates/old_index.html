@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S3 File Viewer</title>
+</head>
+<body>
+    <h1>S3 File Viewer</h1>
+    <ul>
+        {% for filename, url in files.items() %}
+            <li>
+                <a href="{{ url }}" target="_blank">{{ filename }}</a>
+                {% if filename.endswith('.jpg') or filename.endswith('.png') or filename.endswith('.gif') %}
+                    <br><img src="{{ url }}" alt="{{ filename }}" width="300">
+                {% elif filename.endswith('.pdf') %}
+                    <br><iframe src="{{ url }}" width="600" height="400"></iframe>
+                {% elif filename.endswith('.mp4') or filename.endswith('.webm') %}
+                    <br><video controls width="600">
+                        <source src="{{ url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                {% elif filename.endswith('.txt') %}
+                    <br><iframe src="{{ url }}" width="600" height="200"></iframe>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S3 File Viewer</title>
+    <style>
+        .file-content {
+            display: none; /* Hide content initially */
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .file-link {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>S3 File Viewer</h1>
+    <ul>
+        {% for filename in files %}
+            <li>
+                <span class="file-link" onclick="fetchPresignedUrl('{{ loop.index }}', '{{ filename }}')">
+                    {{ filename }}
+                </span>
+                <pre id="content-{{ loop.index }}" class="file-content"></pre>
+            </li>
+        {% endfor %}
+    </ul>
+
+<script>
+    function fetchPresignedUrl(index, filename) {
+        let contentBlock = document.getElementById("content-" + index);
+
+        if (contentBlock.style.display === "block") {
+            contentBlock.style.display = "none"; // Hide content if already open
+        } else {
+            fetch(`/get_url?key=${encodeURIComponent(filename)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.url) {
+                        fetch(data.url)
+                            .then(response => {
+                                let contentType = response.headers.get("Content-Type");
+                                
+                                if (contentType.startsWith("text/") || contentType.includes("json")) {
+                                    return response.text().then(text => {
+                                        contentBlock.innerHTML = `<pre>${text}</pre>`;
+                                        contentBlock.style.display = "block";
+                                    });
+                                } else if (contentType.startsWith("image/")) {
+                                    contentBlock.innerHTML = `<img src="${data.url}" alt="${filename}" width="600">`;
+                                    contentBlock.style.display = "block";
+                                } else if (contentType === "application/pdf") {
+                                    contentBlock.innerHTML = `<iframe src="${data.url}" width="600" height="400"></iframe>`;
+                                    contentBlock.style.display = "block";
+                                } else if (contentType.startsWith("video/")) {
+                                    contentBlock.innerHTML = `<video controls width="600"><source src="${data.url}" type="${contentType}">Your browser does not support the video tag.</video>`;
+                                    contentBlock.style.display = "block";
+                                } else {
+                                    contentBlock.innerHTML = `<a href="${data.url}" target="_blank">Download ${filename}</a>`;
+                                    contentBlock.style.display = "block";
+                                }
+                            })
+                            .catch(error => {
+                                contentBlock.textContent = "Error loading file.";
+                                contentBlock.style.display = "block";
+                            });
+                    } else {
+                        contentBlock.textContent = "Failed to generate URL.";
+                        contentBlock.style.display = "block";
+                    }
+                })
+                .catch(error => {
+                    contentBlock.textContent = "Error requesting file.";
+                    contentBlock.style.display = "block";
+                });
+        }
+    }
+</script>
+
+</body>
+</html>
+
