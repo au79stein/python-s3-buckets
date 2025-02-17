@@ -26,7 +26,7 @@
     <ul>
         {% for filename in files %}
             <li>
-                <span class="file-link" onclick="fetchPresignedUrl('{{ loop.index }}', '{{ filename }}')">
+                <span class="file-link" onclick="toggleFile('{{ loop.index }}', '{{ url_for('view_file', key=filename) }}')">
                     {{ filename }}
                 </span>
                 <pre id="content-{{ loop.index }}" class="file-content"></pre>
@@ -34,57 +34,31 @@
         {% endfor %}
     </ul>
 
-<script>
-    function fetchPresignedUrl(index, filename) {
-        let contentBlock = document.getElementById("content-" + index);
+    <script>
+        function toggleFile(index, url) {
+            let contentBlock = document.getElementById("content-" + index);
 
-        if (contentBlock.style.display === "block") {
-            contentBlock.style.display = "none"; // Hide content if already open
-        } else {
-            fetch(`/get_url?key=${encodeURIComponent(filename)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.url) {
-                        fetch(data.url)
-                            .then(response => {
-                                let contentType = response.headers.get("Content-Type");
-                                
-                                if (contentType.startsWith("text/") || contentType.includes("json")) {
-                                    return response.text().then(text => {
-                                        contentBlock.innerHTML = `<pre>${text}</pre>`;
-                                        contentBlock.style.display = "block";
-                                    });
-                                } else if (contentType.startsWith("image/")) {
-                                    contentBlock.innerHTML = `<img src="${data.url}" alt="${filename}" width="600">`;
-                                    contentBlock.style.display = "block";
-                                } else if (contentType === "application/pdf") {
-                                    contentBlock.innerHTML = `<iframe src="${data.url}" width="600" height="400"></iframe>`;
-                                    contentBlock.style.display = "block";
-                                } else if (contentType.startsWith("video/")) {
-                                    contentBlock.innerHTML = `<video controls width="600"><source src="${data.url}" type="${contentType}">Your browser does not support the video tag.</video>`;
-                                    contentBlock.style.display = "block";
-                                } else {
-                                    contentBlock.innerHTML = `<a href="${data.url}" target="_blank">Download ${filename}</a>`;
-                                    contentBlock.style.display = "block";
-                                }
-                            })
-                            .catch(error => {
-                                contentBlock.textContent = "Error loading file.";
-                                contentBlock.style.display = "block";
-                            });
-                    } else {
-                        contentBlock.textContent = "Failed to generate URL.";
-                        contentBlock.style.display = "block";
-                    }
-                })
-                .catch(error => {
-                    contentBlock.textContent = "Error requesting file.";
-                    contentBlock.style.display = "block";
-                });
+            if (contentBlock.style.display === "block") {
+                contentBlock.style.display = "none"; // Hide content if already open
+            } else {
+                if (!contentBlock.textContent.trim()) {
+                    // Fetch content only if it's not already loaded
+                    fetch(url)
+                        .then(response => response.text())
+                        .then(text => {
+                            contentBlock.textContent = text;
+                            contentBlock.style.display = "block"; // Show content
+                        })
+                        .catch(error => {
+                            contentBlock.textContent = "Error loading file.";
+                            contentBlock.style.display = "block";
+                        });
+                } else {
+                    contentBlock.style.display = "block"; // Show if already loaded
+                }
+            }
         }
-    }
-</script>
-
+    </script>
 </body>
 </html>
 
