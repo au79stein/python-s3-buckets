@@ -24,6 +24,18 @@ def list_s3_files():
         print(f"Error listing S3 files: {e}")
         return []
 
+def generate_presigned_url(key):
+    """Generate a pre-signed URL for a given S3 object."""
+    try:
+        return s3.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': S3_BUCKET, 'Key': key},
+            ExpiresIn=EXPIRATION
+        )
+    except Exception as e:
+        print(f"Error generating pre-signed URL: {e}")
+        return None
+
 @app.route('/')
 def index():
     """Main page that lists files."""
@@ -34,11 +46,14 @@ def index():
 def view_file(key):
     """Fetch file from S3 and display it inline."""
     try:
-        s3_response = s3.get_object(Bucket=S3_BUCKET, Key=key)
-        content = s3_response['Body'].read()
-        content_type = s3_response['ContentType']  # Get MIME type
-
-        return Response(content, content_type=content_type)
+        # Generate a pre-signed URL for the file
+        presigned_url = generate_presigned_url(key)
+        if presigned_url:
+            s3_response = s3.get_object(Bucket=S3_BUCKET, Key=key)
+            content = s3_response['Body'].read()
+            content_type = s3_response['ContentType']  # Get MIME type
+            return Response(content, content_type=content_type)
+        return "Error fetching file: URL generation failed", 500
     except Exception as e:
         return f"Error fetching file: {e}", 500
 
