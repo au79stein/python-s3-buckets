@@ -16,7 +16,11 @@ s3_viwer_w_urls.py starts flask
   - by default the expiration on a pre-signed url is on hour (3600 s) but this can be changed using --expiration 
 ```
 $: ./s3_viewer_w_urls.py
-usage: s3_viewer_w_urls.py [-h] [--prefix PREFIX] [--region REGION] [--expiration EXPIRATION] bucket
-s3_viewer_w_urls.py: error: the following arguments are required: bucket
+
+    usage: s3_viewer_w_urls.py [-h] [--prefix PREFIX] [--region REGION] [--expiration EXPIRATION] bucket
+    s3_viewer_w_urls.py: error: the following arguments are required: bucket
 ```
 
+## Screenshot
+
+[assets/images/screenshot01.jpg]
