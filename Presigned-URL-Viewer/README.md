@@ -23,6 +23,7 @@ $: ./s3_viewer_w_urls.py
 
 ## Screenshot
 
-[Presigned-URL-Viewer/assets/images/screenshot01.jpeg]
-![s3-file-viewer screenshot01.jpg](https://github.com/au79stein/python-s3-buckets/tree/main/Presigned-URL-Viewer/assets/images/screenshot.jpeg)
-![s3-file-viewer screenshot01.jpg](/assets/images/screenshot.jpeg)
+(Presigned-URL-Viewer/assets/images/screenshot01.jpeg)
+![S3 File View Screen](https://github.com/au79stein/python-s3-buckets/tree/main/Presigned-URL-Viewer/assets/images/screenshot.jpeg)
+
+![S3 File View Screen](/assets/images/screenshot.jpeg)
