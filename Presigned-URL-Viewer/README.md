@@ -23,4 +23,4 @@ $: ./s3_viewer_w_urls.py
 
 ## Screenshot
 
-[assets/images/screenshot01.jpg]
+[Presigned-URL-Viewer/assets/images/screenshot01.jpeg]
