@@ -2,8 +2,8 @@
 
 import boto3
 
-BUCKET = "cloudnost"
-FILE_NAME = "/testing/wrote_string.txt"
+BUCKET = "mybucket"
+FILE_NAME = "testing/wrote_string.txt"
 
 #Creating Session With Boto3.
 session = boto3.Session(
